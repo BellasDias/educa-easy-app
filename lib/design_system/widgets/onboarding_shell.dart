@@ -1,16 +1,9 @@
-// lib/design_system/widgets/onboarding_shell.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class OnboardingShell extends StatelessWidget {
-  /// O conteúdo central da tela (texto, campos de input, etc.)
   final Widget child;
-
-  /// Controla a visibilidade do botão 'Voltar'
   final bool showBackButton;
-
-  /// Ação personalizada para o botão voltar. Se nulo, faz Navigator.pop(context)
   final VoidCallback? onBack;
 
   const OnboardingShell({
@@ -22,37 +15,34 @@ class OnboardingShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: Colors.white, // Cor de fundo base (se o SVG tiver transparência)
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // 1. O Fundo SVG (Ocupa toda a tela)
+          // 1. Background (Positioned must be the direct child of Stack)
           Positioned.fill(
-            child: SvgPicture.asset(
-              'assets/svg/dots.svg',
-              fit: BoxFit.cover, // Faz o SVG cobrir todo o fundo sem distorcer
+            child: IgnorePointer(
+              child: SvgPicture.asset(
+                'assets/svg/dots.svg',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
 
-          // 2. O Conteúdo (Logo, Voltar, Child, Botão)
+          // 2. Main Content
           SafeArea(
-            child: Column(  
-              children: [  
-                const SizedBox(height: 20),  
-                _buildHeader(context),  
-                const SizedBox(height: 16),  
-                // ✅ Expanded ao invés de Flexible  
-                Expanded(  
-                  child: SingleChildScrollView(  
-                    padding: EdgeInsets.zero,  // ← Remove padding duplicado  
-                    child: Padding(  
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),  
-                      child: child,  // ← Seu child SEM padding  
-                    ),  
-                  ),  
-                ),  
-              ],  
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                _buildHeader(context),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                    child: child, // Ensure 'child' doesn't contain an Expanded/Positioned incorrectly!
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -60,55 +50,28 @@ class OnboardingShell extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {  
-  return Container(  
-    height: 48,  
-    padding: const EdgeInsets.symmetric(horizontal: 16),  
-    child: Stack(  // ← SÓ Stack!  
-      children: [  
-        // BackButton à esquerda  
-        if (showBackButton)  
-          Positioned(  
-            left: 0,  
-            child: _buildBackButton(context),  
-          ),  
-        // Logo PERFEITA no centro  
-        Positioned(  
-          left: 0, right: 0,  
-          child: Center(  
-            child: SvgPicture.asset('assets/svg/logo.svg', height: 32),  
-          ),  
-        ),  
-      ],  
-    ),  
-  );  
-}  
-
-// _buildBackButton permanece igual (Container com Icon)  
-
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      // Use a Row instead of a Stack for headers to avoid 'hasSize' issues
+      child: NavigationToolbar(
+        leading: showBackButton ? _buildBackButton(context) : null,
+        centerMiddle: true,
+        middle: SvgPicture.asset(
+          'assets/svg/logo.svg', 
+          height: 32,
+          // Adding a placeholder prevents layout jumps
+          placeholderBuilder: (context) => const SizedBox(height: 32, width: 32),
+        ),
+      ),
+    );
+  }
 
   Widget _buildBackButton(BuildContext context) {
-    return Container(  
-      height: 48,  
-      padding: const EdgeInsets.symmetric(horizontal: 16),  
-      child: Stack(  // ← Stack é rei pra sobreposição perfeita  
-        children: [  
-          // BackButton à esquerda  
-          if (showBackButton)  
-            Positioned(  
-              left: 0,  
-              child: _buildBackButton(context),  
-            ),  
-          // Logo NO EXATO CENTRO  
-          Positioned(  
-            left: 0,  
-            right: 0,  
-            child: Center(  
-              child: SvgPicture.asset('assets/svg/logo.svg',height: 32),  
-            ),  
-          ),  
-        ],  
-      ),  
-    ); 
+    return IconButton(
+      icon: const Icon(Icons.arrow_back_ios, size: 20),
+      onPressed: onBack ?? () => Navigator.of(context).maybePop(),
+    );
   }
 }

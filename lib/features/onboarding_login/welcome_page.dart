@@ -29,21 +29,21 @@ class WelcomePage extends StatelessWidget {
                 child: SizedBox(  
                   width: double.infinity,  
                   child: EducaeasyButton(
-                      text: 'Começar',
-                      variant: ButtonVariant.primary,  // ← Roxo!
-                      icon: Icon(
-                        LucideIcons.play,
-                        color: AppColors.gray00,  // ← Branco no roxo
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NameInputPage(),
-                          ),
-                        );
-                      },
+                    text: 'Começar',
+                    variant: ButtonVariant.primary,  // ← Roxo!
+                    icon: Icon(
+                      LucideIcons.play,
+                      color: AppColors.gray00,  // ← Branco no roxo
                     ),
+                    onPressed: () {
+                      Navigator.push(
+                      context,
+                        MaterialPageRoute(
+                          builder: (context) => const NameInputPage(),
+                        ),
+                      );
+                    },
+                  ),
                 ),  
               ),  
               const SizedBox(height: 16),  
