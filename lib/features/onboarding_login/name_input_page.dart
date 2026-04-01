@@ -9,21 +9,18 @@ class NameInputPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return OnboardingShell(
       showBackButton: true, 
-      child: Padding(
-        padding: EdgeInsets.zero,
-        child: Column(  
-          mainAxisSize: MainAxisSize.min, 
-          children: [
-            const SizedBox(  // ✅ 3. const + height  
-              width: double.infinity,  
-              height: 52,  
-              child: EducaeasyInput(  
-                placeholder: 'Seu nome',  
-              ),  
-            ), 
-            const Spacer(),
-          ], 
-        ),
+      child: Column(  
+        // Removido: mainAxisSize: MainAxisSize.min (não é necessário aqui)
+        children: [
+          const SizedBox(  
+            width: double.infinity,  
+            height: 52,  
+            child: EducaeasyInput(  
+              placeholder: 'Seu nome',  
+            ),  
+          ), 
+          const SizedBox(height: 20), // 👈 USE SIZEDBOX EM VEZ DE SPACER
+        ], 
       ),
     );
   }

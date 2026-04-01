@@ -13,42 +13,43 @@ class OnboardingShell extends StatelessWidget {
     this.onBack,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          // 1. Background (Positioned must be the direct child of Stack)
-          Positioned.fill(
-            child: IgnorePointer(
-              child: SvgPicture.asset(
-                'assets/svg/dots.svg',
-                fit: BoxFit.cover,
-              ),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    body: Stack(
+      fit: StackFit.expand, // 👈 ADICIONE ISSO AQUI
+      children: [
+        // 1. Background
+        Positioned.fill(
+          child: IgnorePointer(
+            child: SvgPicture.asset(
+              'assets/svg/dots.svg',
+              fit: BoxFit.cover,
             ),
           ),
+        ),
 
-          // 2. Main Content
-          SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                _buildHeader(context),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                    child: child, // Ensure 'child' doesn't contain an Expanded/Positioned incorrectly!
-                  ),
+        // 2. Main Content
+        SafeArea(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              _buildHeader(context),
+              const SizedBox(height: 16),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  child: child, // Ensure 'child' doesn't contain an Expanded/Positioned incorrectly!
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildHeader(BuildContext context) {
     return Container(
