@@ -62,7 +62,8 @@ class _EducaeasyInputState extends State<EducaeasyInput> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200), // Animação suave de 200ms
       height: 52, // Altura fixa
       decoration: BoxDecoration(
         color: Colors.white, // Cor de fundo
@@ -71,7 +72,15 @@ class _EducaeasyInputState extends State<EducaeasyInput> {
           color: _borderColor,
           width: 2,  // ← Stroke 2px
         ),
-        boxShadow: [ // Sombra baseada na cor da borda
+        boxShadow: [ 
+          if (_isFocused)// Sombra baseada na cor da borda
+            BoxShadow(
+              // Cor da borda externa (mesma do foco, mas com baixa opacidade)
+              color: _borderColor.withValues(alpha: 0.2), 
+              spreadRadius: 4, // Define o quanto ela "vaza" para fora
+              blurRadius: 0,   // 0 deixa ela sólida como uma borda real
+            ),
+            // Sombra padrão (você pode manter ou remover quando focado)
           BoxShadow(
             color: _borderColor.withValues(alpha: 0.1),
             blurRadius: 8,

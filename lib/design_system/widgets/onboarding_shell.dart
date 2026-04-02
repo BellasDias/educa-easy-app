@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:educaeasy_app/design_system/widgets/button.dart';
 
 class OnboardingShell extends StatelessWidget {
   final Widget child;
+  final Widget? footer;
   final bool showBackButton;
   final VoidCallback? onBack;
 
@@ -10,15 +12,16 @@ class OnboardingShell extends StatelessWidget {
     super.key,
     required this.child,
     this.showBackButton = true,
-    this.onBack,
+    this.onBack, this.footer,
   });
 
 @override
 Widget build(BuildContext context) {
   return Scaffold(
     backgroundColor: Colors.white,
+    resizeToAvoidBottomInset: true, // Faz o botão subir com o teclado
     body: Stack(
-      fit: StackFit.expand, // 👈 ADICIONE ISSO AQUI
+      fit: StackFit.expand,
       children: [
         // 1. Background
         Positioned.fill(
@@ -43,6 +46,16 @@ Widget build(BuildContext context) {
                   child: child, // Ensure 'child' doesn't contain an Expanded/Positioned incorrectly!
                 ),
               ),
+              // Footer Dinâmico: Se houver algo no footer, ele renderiza aqui
+              if (footer != null)
+                Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: footer,
+                  ),
+                ),
             ],
           ),
         ),
@@ -70,8 +83,11 @@ Widget build(BuildContext context) {
   }
 
   Widget _buildBackButton(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.arrow_back_ios, size: 20),
+    return EducaeasyButton(
+      text: '',
+      variant: ButtonVariant.outline,
+      isIconOnly: true,
+      icon: const Icon(Icons.arrow_back_ios_new, size: 18),
       onPressed: onBack ?? () => Navigator.of(context).maybePop(),
     );
   }

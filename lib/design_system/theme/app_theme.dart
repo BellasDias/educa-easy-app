@@ -28,10 +28,10 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.gray00,
 
       // 🔤 TYPOGRAPHY SYSTEM
-      textTheme: const TextTheme(
-        titleLarge: AppTypography.title,
-        bodyMedium: AppTypography.body,
-        labelLarge: AppTypography.button,
+      textTheme: TextTheme(
+        titleLarge: AppTypography.title(),
+        bodyMedium: AppTypography.body(),
+        labelLarge: AppTypography.button(),
       ),
 
       // 🔘 BOTÃO PADRÃO (fallback)
@@ -39,7 +39,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.purplePrimary,
           foregroundColor: Colors.white,
-          textStyle: AppTypography.button,
+          textStyle: AppTypography.button(),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
           ),

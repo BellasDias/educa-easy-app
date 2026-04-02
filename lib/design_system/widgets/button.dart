@@ -10,6 +10,7 @@ class EducaeasyButton extends StatefulWidget {
   final VoidCallback? onPressed;
   final bool isIconOnly;
   final Widget? icon;
+  final double? size;
 
   const EducaeasyButton({
     super.key,
@@ -18,6 +19,7 @@ class EducaeasyButton extends StatefulWidget {
     this.onPressed,
     this.isIconOnly = false,
     this.icon,
+    this.size,
   });
 
   @override
@@ -112,6 +114,8 @@ class _EducaeasyButtonState extends State<EducaeasyButton> {
         ? BoxShadow(color: shadowColor, offset: const Offset(0, 4))
         : null;
 
+    final double? buttonSize = widget.isIconOnly ? (widget.size ?? 48) : null;
+
     return GestureDetector(
       onTapDown: (_) => widget.onPressed != null ? setState(() => _isPressed = true) : null,
       onTapUp: (_) {
@@ -123,7 +127,11 @@ class _EducaeasyButtonState extends State<EducaeasyButton> {
       onTapCancel: () => widget.onPressed != null ? setState(() => _isPressed = false) : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 80),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        width: buttonSize,
+        height: buttonSize,
+        padding: widget.isIconOnly
+          ? EdgeInsets.zero // Tamanho certo do button somente com icon
+          : const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         margin: EdgeInsets.only(
           top: _isPressed ? 2 : 0,    // Quando pressiona, desce 2px
           bottom: _isPressed ? 0 : 2, // Quando solta, a margem volta para baixo
@@ -136,29 +144,26 @@ class _EducaeasyButtonState extends State<EducaeasyButton> {
           ),
           shadows: shadow != null ? [shadow] : null,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 1. Mostra o ícone somente se ele não for nulo
-            if (widget.icon != null) ...[
-              widget.icon!,
-              // Adiciona espaço apenas se houver texto para acompanhar o ícone
-              if (!widget.isIconOnly) const SizedBox(width: 8),
-            ],
-            
-            // 2. Mostra o texto apenas se NÃO for "isIconOnly"
-            if (!widget.isIconOnly)
-              Text(
-                widget.text,
-                style: GoogleFonts.nunito(
-                  color: _getTextColor(), // Usa sua lógica dinâmica de cores
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                ),
+        child: widget.isIconOnly 
+            ? Center(child: widget.icon) // Centraliza o ícone no quadrado
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (widget.icon != null) ...[
+                    widget.icon!,
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    widget.text,
+                    style: GoogleFonts.nunito(
+                      color: _getTextColor(),
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
-          ],
-        ),
       ),
     );
   }

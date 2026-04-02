@@ -14,7 +14,7 @@ class WelcomePage extends StatelessWidget {
       showBackButton: false,
         child: Padding(  
           padding: EdgeInsets.only(  // Deixando os components (botões) no centro da tela 
-            top: MediaQuery.of(context).size.height * 0.35,  
+            top: MediaQuery.of(context).size.height * 0.30,  
             bottom: MediaQuery.of(context).size.height * 0.25,  
           ), 
           child: Column(  
