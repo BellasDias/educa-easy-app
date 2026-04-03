@@ -2,7 +2,7 @@ import 'package:educaeasy_app/design_system/widgets/button.dart';
 import 'package:educaeasy_app/features/home/widgets/home_background.dart';
 import 'package:educaeasy_app/features/home/widgets/home_logo.dart';
 import 'package:flutter/material.dart';
-import '../onboarding_login/welcome_page.dart';
+import '../onboarding/presentation/welcome_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

@@ -3,7 +3,7 @@ import 'package:educaeasy_app/design_system/widgets/button.dart';
 import 'package:educaeasy_app/design_system/widgets/onboarding_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import './name_input_page.dart';
+import 'name_input_page.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});

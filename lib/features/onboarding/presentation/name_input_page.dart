@@ -1,7 +1,7 @@
 import 'package:educaeasy_app/design_system/tokens/colors.dart';
 import 'package:educaeasy_app/design_system/widgets/button.dart';
 import 'package:educaeasy_app/design_system/widgets/onboarding_shell.dart';
-import 'package:educaeasy_app/features/onboarding_login/login_methods_page.dart';
+import 'package:educaeasy_app/features/onboarding/presentation/login_methods_page.dart';
 import 'package:flutter/material.dart';
 import 'package:educaeasy_app/design_system/widgets/input.dart';
 import 'package:educaeasy_app/design_system/tokens/typography.dart';
