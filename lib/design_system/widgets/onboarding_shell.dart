@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:educaeasy_app/design_system/widgets/button.dart';
+import 'package:go_router/go_router.dart';
 
 class OnboardingShell extends StatelessWidget {
   final Widget child;
@@ -88,7 +89,15 @@ Widget build(BuildContext context) {
       variant: ButtonVariant.outline,
       isIconOnly: true,
       icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-      onPressed: onBack ?? () => Navigator.of(context).maybePop(),
+      onPressed: onBack ?? () {
+        // Verifica se há páginas na pilha do GoRouter antes de tentar voltar
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          // Fallback de segurança: se não der pra voltar, vai para a home ou welcome
+          context.go('/welcome');
+        }
+      },
     );
   }
 }

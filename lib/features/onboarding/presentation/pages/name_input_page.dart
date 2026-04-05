@@ -46,7 +46,7 @@ class _NameInputPageState extends State<NameInputPage> {
       
       // Se deu tudo certo e a tela ainda está aberta, vai para a próxima página usando GoRouter
       if (mounted) {
-        context.go('/login_methods');
+        context.push('/login_methods');
       }
     } catch (e) {
       print('Erro ao salvar nome: $e');

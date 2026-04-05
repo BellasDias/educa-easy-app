@@ -19,17 +19,19 @@ class AppRouter {
       final isAuthenticated = user != null;
 
       // Se o app está tentando abrir a /home inicial...
-      if (state.matchedLocation == '/home') {
+      if (state.matchedLocation == '/home' && isAuthenticated) {
         if (isAuthenticated) {
           // Tem conta conectada -> Vai para Níveis
           return '/levels'; 
-        } else {
-          // Não tem conta -> Vai para o fluxo inicial de Welcome
-          return '/welcome'; 
+        
+        }
+        final isProtectedPath = state.matchedLocation == '/levels';
+        if (isProtectedPath && !isAuthenticated){
+          return '/welcome';
         }
       }
-      
       // Retornar null significa: "Pode seguir a navegação normalmente"
+      // Se não estiver logado e acessar '/home', ele vai cair aqui e a tela será renderizada.
       return null; 
     },
 

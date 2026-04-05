@@ -33,7 +33,7 @@ class _LoginMethodsPageState extends State<LoginMethodsPage> {
       
       // SÓ VAI PARA A HOME SE O LOGIN FOR BEM SUCEDIDO
       if (sucesso && mounted) {
-        context.go('/home');
+        context.push('/home');
       } else {
         print("A janela do Google não abriu ou o login falhou!");
       }
