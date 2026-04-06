@@ -1,3 +1,5 @@
+import 'package:educaeasy_app/features/levels/presentation/pages/levels_page.dart';
+import 'package:educaeasy_app/features/onboarding/presentation/pages/age_input_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
@@ -52,17 +54,11 @@ class AppRouter {
         path: '/login_methods',
         builder: (context, state) => const LoginMethodsPage(),
       ),
-
-      // ==========================================
-      // ROTAS FUTURAS (PLACEHOLDERS)
-      // ==========================================
       
       GoRoute(
         path: '/age_input',
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Tela de Idade (Em construção)')),
+        builder: (context, state) => const AgeInputPage(),
         ),
-      ),
       GoRoute(
         path: '/login',
         builder: (context, state) => const Scaffold(
@@ -71,19 +67,7 @@ class AppRouter {
       ),
       GoRoute(
         path: '/levels',
-        builder: (context, state) => Scaffold(
-          appBar: AppBar(title: const Text('Níveis')),
-          body: Center(
-            child: ElevatedButton(
-              onPressed: () async {
-                // Botão provisório só para podermos deslogar e testar o fluxo de "sem conta"
-                await FirebaseAuth.instance.signOut();
-                if (context.mounted) context.go('/home');
-              },
-              child: const Text('Deslogar (Teste)'),
-            ),
-          ),
-        ),
+        builder: (context, state) => const LevelsPage(),
       ),
     ],
   );
