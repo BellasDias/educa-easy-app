@@ -1,81 +1,141 @@
 import 'package:flutter/material.dart';
+
 import '../../domain/models/level_model.dart';
 
+/// Widget responsável por exibir o nó de nível no mapa.
+///
+/// Regras de negócio visuais:
+/// - Mantém o visual principal do design (container branco com borda cinza e sombra inferior);
+/// - Ajusta estados (locked/current/completed) sem acoplar lógica diretamente na árvore;
+/// - Exibe estrelas apenas quando o nível pode ser acessado e possui progresso.
 class LevelIconWidget extends StatelessWidget {
   final LevelModel level;
-  
+
   const LevelIconWidget({super.key, required this.level});
+
+  // Tokens visuais centralizados para facilitar manutenção e evolução de design system.
+  static const Color _baseBackgroundColor = Colors.white;
+  static const Color _defaultBorderColor = Color(0xFFE4E7EB); // gray-10
+  static const Color _defaultBottomShadowColor = Color(0xFFCBD2D9); // gray-30
+  static const Color _numberColor = Color(0xFF323F4B); // gray-80
+  static const Color _activeAccentColor = Color(0xFF2D9CDB);
+  static const Color _completedAccentColor = Color(0xFF4CAF50);
+
+  // Escala visual do componente.
+  static const double _regularSize = 108;
+  static const double _specialSize = 124;
+  static const double _borderWidth = 4;
+  static const double _bottomShadowOffsetY = 8;
+  static const double _numberFontSize = 56;
+  static const double _specialIconSize = 42;
+  static const double _lockIconSize = 40;
 
   @override
   Widget build(BuildContext context) {
-    Color mainColor = const Color(0xFF4CAF50); // Verde (Concluído)
-    Color textColor = Colors.white;
-    
-    // 1. CLEAN CODE: Lendo o Enum em vez dos antigos booleanos
-    if (level.status == LevelStatus.current) {
-      mainColor = const Color(0xFF2196F3); // Azul (Atual/Ativo)
-    } else if (level.status == LevelStatus.locked) {
-      mainColor = Colors.grey.shade300; // Cinza (Bloqueado)
-      textColor = Colors.grey.shade600;
-    }
-
     return GestureDetector(
-      onTap: () {
-        // 2. CLEAN CODE: Validação de clique baseada no Enum
-        if (level.status != LevelStatus.locked) {
-          print('Abrindo nível ${level.index}');
-        }
-      },
+      // Habilita clique apenas para níveis desbloqueados.
+      onTap: _isLocked ? null : _handleTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: level.isSpecial ? 80 : 64,
-            height: level.isSpecial ? 80 : 64,
-            decoration: BoxDecoration(
-              color: mainColor,
-              shape: BoxShape.circle,
-              border: Border.all(
-                // 3. CLEAN CODE: Validação de borda baseada no Enum
-                color: level.status == LevelStatus.locked ? Colors.grey.shade400 : Colors.white,
-                width: 5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Center(
-              child: level.isSpecial
-                  ? const Icon(Icons.redeem, color: Colors.white, size: 40)
-                  : (level.status == LevelStatus.locked
-                      ? const Icon(Icons.lock_rounded, color: Colors.grey)
-                      : Text(
-                          '${level.index}',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
-            ),
-          ),
-          // 4. CLEAN CODE: Mostra estrelas apenas se não estiver bloqueado e tiver estrelas
-          if (level.status != LevelStatus.locked && level.starCount > 0) ...[
-            const SizedBox(height: 6),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(
-                level.starCount,
-                (index) => const Icon(Icons.star, color: Color(0xFFFFD700), size: 20),
-              ),
-            ),
+          _buildLevelBadge(),
+          if (_shouldShowStars) ...[
+            const SizedBox(height: 8),
+            _buildStarsRow(),
           ],
         ],
       ),
     );
+  }
+
+  /// Indica se o nível está bloqueado.
+  bool get _isLocked => level.status == LevelStatus.locked;
+
+  /// Indica se o nível está atualmente ativo.
+  bool get _isCurrent => level.status == LevelStatus.current;
+
+  /// Exibe estrelas apenas em níveis acessíveis com progresso.
+  bool get _shouldShowStars => !_isLocked && level.starCount > 0;
+
+  /// Define tamanho do badge conforme tipo do nível.
+  double get _badgeSize => level.isSpecial ? _specialSize : _regularSize;
+
+  /// Cor de borda orientada ao estado para reforço visual discreto.
+  Color get _borderColor {
+    if (_isLocked) return _defaultBorderColor;
+    if (_isCurrent) return _activeAccentColor;
+    return _completedAccentColor;
+  }
+
+  /// Constrói o badge principal no estilo do design desejado.
+  Widget _buildLevelBadge() {
+    return Container(
+      width: _badgeSize,
+      height: _badgeSize,
+      padding: const EdgeInsets.all(12),
+      decoration: ShapeDecoration(
+        color: _baseBackgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(999),
+          side: BorderSide(color: _borderColor, width: _borderWidth),
+        ),
+        shadows: const [
+          // Sombra seca no eixo Y para aproximar do mock de referência.
+          BoxShadow(
+            color: _defaultBottomShadowColor,
+            blurRadius: 0,
+            offset: Offset(0, _bottomShadowOffsetY),
+          ),
+        ],
+      ),
+      child: Center(child: _buildInnerContent()),
+    );
+  }
+
+  /// Renderiza conteúdo interno do badge com prioridade por regra:
+  /// 1) nível especial -> ícone de recompensa;
+  /// 2) nível bloqueado -> cadeado;
+  /// 3) nível comum acessível -> número do nível.
+  Widget _buildInnerContent() {
+    if (level.isSpecial) {
+      return Icon(
+        Icons.redeem_rounded,
+        size: _specialIconSize,
+        color: _isLocked ? Colors.grey.shade500 : _numberColor,
+      );
+    }
+
+    if (_isLocked) {
+      return Icon(Icons.lock_rounded, size: _lockIconSize, color: Colors.grey.shade500);
+    }
+
+    return Text(
+      '${level.index}',
+      style: const TextStyle(
+        color: _numberColor,
+        fontSize: _numberFontSize,
+        fontWeight: FontWeight.w800,
+        height: 0.97,
+      ),
+    );
+  }
+
+  /// Componente isolado para facilitar evolução (animação, badges extras, etc).
+  Widget _buildStarsRow() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        level.starCount,
+        (_) => const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 1),
+          child: Icon(Icons.star, color: Color(0xFFFFD700), size: 18),
+        ),
+      ),
+    );
+  }
+
+  /// Callback do clique em nível acessível.
+  void _handleTap() {
+    debugPrint('Abrindo nível ${level.index}');
   }
 }
