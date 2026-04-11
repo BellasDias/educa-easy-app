@@ -9,12 +9,12 @@ class LevelDescriptionBadge extends StatelessWidget {
   final bool descriptionOnLeft;
 
   const LevelDescriptionBadge({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.badgeContent,
     this.descriptionOnLeft = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

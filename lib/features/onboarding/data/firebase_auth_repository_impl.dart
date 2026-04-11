@@ -27,14 +27,14 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
   Future<bool> signInWithGoogle() async {
     try {
       // 2. NOVO PACOTE (v7+): O método correto agora é o authenticate()
-      final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate();
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
       
       if (googleUser == null) {
         print("Login cancelado ou bloqueado.");
         return false; 
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
       
       // 3. NOVO PACOTE (v7+): O Firebase SÓ precisa do idToken! 
       // O accessToken foi removido dessa classe na versão nova.

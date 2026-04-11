@@ -1,4 +1,4 @@
-import 'package:educaeasy_app/features/levels/presentation/pages/levels_page.dart';
+import 'package:educaeasy_app/features/levels_map/presentation/pages/levels_page.dart';
 import 'package:educaeasy_app/features/onboarding/presentation/pages/age_input_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';

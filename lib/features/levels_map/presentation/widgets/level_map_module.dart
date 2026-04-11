@@ -1,4 +1,4 @@
-import 'package:educaeasy_app/features/levels/presentation/widgets/level_item.dart';
+import 'package:educaeasy_app/features/levels_map/presentation/widgets/level_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../domain/models/level_model.dart';
