@@ -93,10 +93,25 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
   Widget build(BuildContext context) {
     return OnboardingShell(
       showBackButton: true, // Adiciona o botão de voltar no topo
-      footer: EducaeasyButton(
-        text: _isLoading ? 'Criando...' : 'Finalizar',
-        variant: ButtonVariant.primary,
-        onPressed: _isLoading ? () {} : _handleSignup,
+      footer: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "Ainda não tem uma conta?",
+            style: AppTypography.body(color: AppColors.gray40),
+          ),
+          GestureDetector(
+            onTap: () {
+              context.push('/signup');
+            },
+            child: Text(
+              "Criar uma conta",
+              style: AppTypography.body(color: Colors.blue).copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+            ),
+          ),
+        ],
       ),
       child: Padding(
         padding: EdgeInsets.only(
@@ -149,6 +164,14 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
                   ),
                 ),
               ],
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: EducaeasyButton(
+              text: _isLoading ? 'Criando...' : 'Finalizar',
+              variant: ButtonVariant.primary,
+              onPressed: _isLoading ? () {} : _handleSignup,
+              ),
             ),
           ],
         ),
