@@ -1,14 +1,19 @@
 // lib/features/onboarding/data/firebase_auth_repository_impl.dart
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../domain/auth_repository.dart';
 
 class FirebaseAuthRepositoryImpl implements AuthRepository {
   final FirebaseAuth _firebaseAuth;
-
-  // 1. NOVO PACOTE (v7+): Exige o '.instance' (Singleton)
+  
+  // Singleton do Google SignIn
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  
+  // Instância do Cloud Firestore
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   FirebaseAuthRepositoryImpl(this._firebaseAuth);
 
@@ -17,45 +22,92 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
     try {
       UserCredential credential = await _firebaseAuth.signInAnonymously();
       await credential.user?.updateDisplayName(name);
+      
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_name', name);
+      
       print("Nome salvo com sucesso: ${credential.user?.displayName}");
     } catch (e) {
       throw Exception('Erro ao salvar o nome: $e');
+    }
+  }
+
+  @override
+  Future<void> saveUserAge(int age) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('user_age', age);
+      print("Idade salva localmente: $age");
+    } catch (e) {
+      throw Exception('Erro ao salvar a idade: $e');
     }
   }
   
   @override
   Future<bool> signInWithGoogle() async {
     try {
-      // 2. NOVO PACOTE (v7+): O método correto agora é o authenticate()
-      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate();
       
       if (googleUser == null) {
         print("Login cancelado ou bloqueado.");
         return false; 
       }
 
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       
-      // 3. NOVO PACOTE (v7+): O Firebase SÓ precisa do idToken! 
-      // O accessToken foi removido dessa classe na versão nova.
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
 
       final currentUser = _firebaseAuth.currentUser;
       
-      // Vincula a conta do Google na conta invisível (anônima) atual
       if (currentUser != null && currentUser.isAnonymous) {
         await currentUser.linkWithCredential(credential);
       } else {
         await _firebaseAuth.signInWithCredential(credential);
       }
       
+      await syncProfileToCloud();
+      
       return true; 
       
     } catch (e) {
       print('Erro no Google Sign-In: $e');
       return false; 
+    }
+  }
+
+  @override
+  Future<void> signUpWithEmail(String email, String password) async {
+    try {
+      await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+      await syncProfileToCloud();
+    } catch (e) {
+      throw Exception('Erro ao criar conta com e-mail: $e');
+    }
+  }
+
+  @override
+  Future<void> syncProfileToCloud() async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      final name = prefs.getString('user_name') ?? user.displayName ?? '';
+      final age = prefs.getInt('user_age') ?? 0;
+
+      await _firestore.collection('users').doc(user.uid).set({
+        'name': name,
+        'age': age,
+        'email': user.email ?? '',
+        'isAnonymous': user.isAnonymous,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      print("Perfil sincronizado com a nuvem para o UID: ${user.uid}");
+    } catch (e) {
+      throw Exception('Erro ao sincronizar com a nuvem: $e');
     }
   }
 }

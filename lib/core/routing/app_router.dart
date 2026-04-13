@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:educaeasy_app/features/onboarding/presentation/pages/login_methods_page.dart';
 import 'package:educaeasy_app/features/onboarding/presentation/pages/name_input_page.dart';
 import 'package:educaeasy_app/features/onboarding/presentation/pages/welcome_page.dart';
+import 'package:educaeasy_app/features/onboarding/presentation/pages/email_signup_page.dart';
 import '../../features/home/home_page.dart';
 
 class AppRouter {
@@ -68,6 +69,10 @@ class AppRouter {
       GoRoute(
         path: '/levels',
         builder: (context, state) => const LevelsPage(),
+      ),
+      GoRoute(
+        path: '/email_signup',
+        builder: (context, state) => const EmailSignupPage(),
       ),
     ],
   );

@@ -98,7 +98,9 @@ class _LoginMethodsPageState extends State<LoginMethodsPage> {
                 text: isThisLoading ? 'Carregando...' : method['label'],
                 variant: ButtonVariant.outline,
                 icon: isThisLoading ? null : method['icon'], 
-                onPressed: isAnyLoading ? () {} : method['onTap'],
+                onPressed: () {
+                  context.push('/email_signup'); // Manda para a nova tela!
+                },
               ),
             );
           }).toList(),
