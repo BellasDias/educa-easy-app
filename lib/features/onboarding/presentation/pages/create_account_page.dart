@@ -1,4 +1,4 @@
-// lib/features/onboarding/presentation/pages/email_signup_page.dart
+// lib/features/onboarding/presentation/pages/create_account_page.dart
 
 import 'package:educaeasy_app/features/onboarding/data/firebase_auth_repository_impl.dart';
 import 'package:flutter/material.dart';
@@ -11,14 +11,14 @@ import 'package:educaeasy_app/design_system/widgets/button.dart';
 import 'package:educaeasy_app/design_system/widgets/input.dart';
 import 'package:educaeasy_app/design_system/widgets/onboarding_shell.dart';
 
-class EmailSignupPage extends StatefulWidget {
-  const EmailSignupPage({super.key});
+class CreateAccountPage extends StatefulWidget {
+  const CreateAccountPage({super.key});
 
   @override
-  State<EmailSignupPage> createState() => _EmailSignupPageState();
+  State<CreateAccountPage> createState() => _CreateAccountPageState();
 }
 
-class _EmailSignupPageState extends State<EmailSignupPage> {
+class _CreateAccountPageState extends State<CreateAccountPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -97,15 +97,15 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "Ainda não tem uma conta?",
+            "Já tem uma conta?",
             style: AppTypography.body(color: AppColors.gray40),
           ),
           GestureDetector(
             onTap: () {
-              context.push('/create_account');
+              context.push('/name_input');
             },
             child: Text(
-              "Criar uma conta",
+              "Entrar",
               style: AppTypography.body(color: Colors.blue).copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -115,7 +115,7 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
       ),
       child: Padding(
         padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.height * 0.13,
+          top: MediaQuery.of(context).size.height * 0.09,
           bottom: 24,
         ),
         child: Column(
@@ -127,7 +127,7 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
               spacing: 8,
               children: [
                 Text(
-                  "Digite seu e-mail:",
+                  "Digite seu e-mail",
                   style: AppTypography.title(color: AppColors.gray40).copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
@@ -149,7 +149,28 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
               spacing: 8,
               children: [
                 Text(
-                  "Digite seu e-mail:",
+                  "Crie sua senha",
+                  style: AppTypography.title(color: AppColors.gray40).copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  ),
+                ),
+                SizedBox(
+                  height: 52,
+                  child: EducaeasyInput(
+                    placeholder: 'Senha',
+                    controller: _passwordController,
+                    obscureText: true, // Esconde os caracteres (***)
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
+              children: [
+                Text(
+                  "Confirme sua senha",
                   style: AppTypography.title(color: AppColors.gray40).copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
@@ -168,7 +189,7 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
             SizedBox(
               width: double.infinity,
               child: EducaeasyButton(
-              text: _isLoading ? 'Criando...' : 'Entrar',
+              text: _isLoading ? 'Criando...' : 'Criar conta',
               variant: ButtonVariant.primary,
               onPressed: _isLoading ? () {} : _handleSignup,
               ),

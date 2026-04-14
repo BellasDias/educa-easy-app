@@ -1,5 +1,6 @@
 import 'package:educaeasy_app/features/levels_map/presentation/pages/levels_page.dart';
 import 'package:educaeasy_app/features/onboarding/presentation/pages/age_input_page.dart';
+import 'package:educaeasy_app/features/onboarding/presentation/pages/create_account_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +74,10 @@ class AppRouter {
       GoRoute(
         path: '/email_signup',
         builder: (context, state) => const EmailSignupPage(),
+      ),
+      GoRoute(
+        path: '/create_account',
+        builder: (context, state) => const CreateAccountPage(),
       ),
     ],
   );
