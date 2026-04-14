@@ -46,7 +46,7 @@ class _LoginMethodsPageState extends State<LoginMethodsPage> {
 
   // Lógica para Email (Leva para uma tela de digitar senha)
   void _handleEmailLogin() {
-    print("Navegar para tela de input de email/senha");
+    context.push('/email_signup');
   }
 
   // Lógica para Sem Conta (Apenas avança, pois já criamos o user anônimo na tela de Nome)
@@ -98,9 +98,7 @@ class _LoginMethodsPageState extends State<LoginMethodsPage> {
                 text: isThisLoading ? 'Carregando...' : method['label'],
                 variant: ButtonVariant.outline,
                 icon: isThisLoading ? null : method['icon'], 
-                onPressed: () {
-                  context.push('/email_signup'); // Manda para a nova tela!
-                },
+                onPressed: method['onTap'] as void Function(),
               ),
             );
           }).toList(),
