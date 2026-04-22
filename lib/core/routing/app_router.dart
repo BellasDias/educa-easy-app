@@ -9,6 +9,7 @@ import 'package:educaeasy_app/features/onboarding/presentation/pages/login_metho
 import 'package:educaeasy_app/features/onboarding/presentation/pages/name_input_page.dart';
 import 'package:educaeasy_app/features/onboarding/presentation/pages/welcome_page.dart';
 import 'package:educaeasy_app/features/onboarding/presentation/pages/email_signup_page.dart';
+import 'package:educaeasy_app/features/levels/presentation/pages/sequence_level_page.dart';
 import '../../features/home/home_page.dart';
 
 class AppRouter {
@@ -78,6 +79,10 @@ class AppRouter {
       GoRoute(
         path: '/create_account',
         builder: (context, state) => const CreateAccountPage(),
+      ),
+      GoRoute(
+        path: '/sequence_level',
+        builder: (context, state) => const SequenceLevelPage(),
       ),
     ],
   );

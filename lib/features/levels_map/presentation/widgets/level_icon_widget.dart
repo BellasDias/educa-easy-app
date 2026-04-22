@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../domain/models/level_model.dart';
 
@@ -34,7 +35,7 @@ class LevelIconWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       // Habilita clique apenas para níveis desbloqueados.
-      onTap: _isLocked ? null : _handleTap,
+      onTap: _isLocked ? null : () => _handleTap(context),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -135,7 +136,8 @@ class LevelIconWidget extends StatelessWidget {
   }
 
   /// Callback do clique em nível acessível.
-  void _handleTap() {
-    debugPrint('Abrindo nível ${level.index}');
+  void _handleTap(BuildContext context) {
+    context.go('/sequence_level');
+    // debugPrint('Abrindo nível ${level.index}');
   }
 }
