@@ -1,28 +1,39 @@
-// Enum isolado para garantir segurança de tipos
+import 'package:flutter/material.dart'; // Necessário para o IconData
+
 enum LevelStatus { completed, current, locked }
 
 class LevelModel {
   final int index;
   final double x;
   final double y;
-  
-  // Propriedades de Design e Estado
   final String title;
   final LevelStatus status;
-  final bool bubbleOnRight; 
-  
-  // Propriedades que estavam faltando!
+  final bool bubbleOnRight;
   final bool isSpecial;
   final int starCount;
+
+  // 🚀 NOVAS PROPRIEDADES DATA-DRIVEN
+  final String? drawerTitle;
+  final String? description;
+  final List<String> conceptTags;
+  final String route;
+  final IconData? drawerIcon;
 
   LevelModel({
     required this.index,
     required this.x,
     required this.y,
     required this.title,
-    this.status = LevelStatus.locked, // Padrão é bloqueado
-    this.bubbleOnRight = true,        // Padrão é balão na direita
-    this.isSpecial = false,           // Padrão é nível normal
-    this.starCount = 0,               // Padrão é 0 estrelas
+    this.status = LevelStatus.locked,
+    this.bubbleOnRight = true,
+    this.isSpecial = false,
+    this.starCount = 0,
+
+    // Valores padrão para as fases que ainda não configuramos
+    this.drawerTitle,
+    this.description,
+    this.conceptTags = const [],
+    this.route = '/sequence_level', // Rota antiga de fallback
+    this.drawerIcon,
   });
 }
