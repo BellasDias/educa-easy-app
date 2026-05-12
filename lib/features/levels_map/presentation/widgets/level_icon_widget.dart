@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../domain/models/level_model.dart';
+import 'level_drawer.dart';
 
 /// Widget responsável por exibir o nó de nível no mapa.
 ///
@@ -107,7 +107,11 @@ class LevelIconWidget extends StatelessWidget {
     }
 
     if (_isLocked) {
-      return Icon(Icons.lock_rounded, size: _lockIconSize, color: Colors.grey.shade500);
+      return Icon(
+        Icons.lock_rounded,
+        size: _lockIconSize,
+        color: Colors.grey.shade500,
+      );
     }
 
     return Text(
@@ -137,7 +141,7 @@ class LevelIconWidget extends StatelessWidget {
 
   /// Callback do clique em nível acessível.
   void _handleTap(BuildContext context) {
-    context.go('/sequence_level');
-    // debugPrint('Abrindo nível ${level.index}');
+    // Não importa qual fase seja clicada, a gaveta universal resolve!
+    LevelDrawer.show(context, level: level);
   }
 }

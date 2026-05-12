@@ -5,6 +5,7 @@ import 'level_icon_widget.dart';
 class LevelMapItem extends StatelessWidget {
   final LevelModel level;
   final double badgeSize;
+
   /// Se true, a caixa fica na esquerda. Se false, fica na direita.
   final bool descriptionOnLeft;
 
@@ -18,7 +19,7 @@ class LevelMapItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Quantos pixels a caixa deve se esconder atrás do ícone
-    const double overlap = 32.0; 
+    const double overlap = 32.0;
 
     // A caixa de descrição (baseada no design anterior)
     final descriptionBox = Container(
@@ -31,25 +32,28 @@ class LevelMapItem extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(
-          width: 1,
-          color: const Color(0xFFE4E7EB),
-        ),
+        border: Border.all(width: 1, color: const Color(0xFFE4E7EB)),
         borderRadius: BorderRadius.horizontal(
-          left: descriptionOnLeft ? const Radius.circular(99) : const Radius.circular(24),
-          right: descriptionOnLeft ? const Radius.circular(24) : const Radius.circular(99),
+          left: descriptionOnLeft
+              ? const Radius.circular(99)
+              : const Radius.circular(24),
+          right: descriptionOnLeft
+              ? const Radius.circular(24)
+              : const Radius.circular(99),
         ),
         boxShadow: const [
           BoxShadow(
             color: Color(0xFFE4E7EB),
             blurRadius: 4,
             offset: Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: descriptionOnLeft ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+        crossAxisAlignment: descriptionOnLeft
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.end,
         children: [
           Text(
             'Nível ${level.index}',
@@ -81,7 +85,8 @@ class LevelMapItem extends StatelessWidget {
       width: badgeSize,
       height: badgeSize,
       child: Stack(
-        clipBehavior: Clip.none, // Permite que a descrição vase o tamanho do badge
+        clipBehavior:
+            Clip.none, // Permite que a descrição vase o tamanho do badge
         alignment: Alignment.center,
         children: [
           // 1. Descrição (Background - fica atrás)
@@ -90,9 +95,13 @@ class LevelMapItem extends StatelessWidget {
             right: descriptionOnLeft ? badgeSize - overlap : null,
             child: descriptionBox,
           ),
-          
-          // 2. O seu Ícone Original (Foreground - fica na frente)
-          LevelIconWidget(level: level),
+
+          // 2. O seu Ícone Original (A MÁGICA ESTÁ AQUI NO OVERFLOWBOX)
+          OverflowBox(
+            maxHeight:
+                200, // Dá o espaço extra para as estrelas não quebrarem a tela
+            child: LevelIconWidget(level: level),
+          ),
         ],
       ),
     );
