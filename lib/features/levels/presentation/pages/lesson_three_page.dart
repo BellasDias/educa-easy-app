@@ -4,28 +4,39 @@ import 'package:go_router/go_router.dart';
 import 'package:educaeasy_app/design_system/tokens/colors.dart';
 import 'package:educaeasy_app/design_system/tokens/typography.dart';
 import '../controllers/lesson_three_controller.dart';
-// IMPORTANTE: Importe o arquivo de progresso que acabamos de criar! Ajuste o caminho.
 import '../../../levels_map/domain/map_progress_provider.dart';
 
 class LessonThreePage extends ConsumerWidget {
   const LessonThreePage({super.key});
+
+  // Função auxiliar para descobrir qual ícone usar com base na palavra
+  IconData _getIconForItem(String item) {
+    switch (item) {
+      case 'Maçã':
+        return Icons.apple;
+      case 'Caderno':
+        return Icons.menu_book_rounded;
+      case 'Pular':
+        return Icons.directions_run_rounded;
+      default:
+        return Icons.extension_rounded; // Ícone genérico caso não ache
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(lessonThreeProvider);
     final controller = ref.read(lessonThreeProvider.notifier);
 
-    // O "Ouvinte Mágico": Quando a fase for vencida, ele age!
+    // O "Ouvinte Mágico"
     ref.listen<LessonThreeState>(lessonThreeProvider, (previous, next) {
       if (next.isSuccess && (previous?.isSuccess != true)) {
-        // 1. Libera a Fase 4 no mapa global!
-        ref.read(mapProgressProvider.notifier).state = 4;
-
-        // 2. Espera 3 segundos e volta pro mapa
+        final currentProgress = ref.read(mapProgressProvider);
+        if (currentProgress < 4) {
+          ref.read(mapProgressProvider.notifier).state = 4;
+        }
         Future.delayed(const Duration(seconds: 3), () {
-          if (context.mounted) {
-            context.pop();
-          }
+          if (context.mounted) context.pop();
         });
       }
     });
@@ -44,7 +55,7 @@ class LessonThreePage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             LinearProgressIndicator(
-              value: state.isSuccess ? 1.0 : 0.5, // Enche a barra se ganhar
+              value: state.isSuccess ? 1.0 : 0.5,
               backgroundColor: AppColors.gray20,
               color: AppColors.purplePrimary,
               minHeight: 8,
@@ -59,41 +70,43 @@ class LessonThreePage extends ConsumerWidget {
             ),
             const SizedBox(height: 48),
 
-            // Linha 1: Lancheira
+            // Linha 1: Lancheira (Agora Laranja!)
             _buildCodeLine(
               number: '1',
               variableName: 'Lancheira',
               droppedItem: state.lancheiraItem,
               onAccept: (item) => controller.setLancheiraItem(item),
+              themeColor: Colors.orange.shade600,
             ),
             const SizedBox(height: 24),
 
-            // Linha 2: Bolsa
+            // Linha 2: Bolsa (Agora Azul!)
             _buildCodeLine(
               number: '2',
               variableName: 'Bolsa',
               droppedItem: state.bolsaItem,
               onAccept: (item) => controller.setBolsaItem(item),
+              themeColor: Colors.blue.shade600,
             ),
 
             const Spacer(),
 
-            // Opções Arrastáveis (Agora com cores corretas!)
+            // Opções Arrastáveis (Sem a corrente e com o ícone correspondente)
             if (!state.isSuccess) ...[
               Wrap(
                 spacing: 16,
                 runSpacing: 16,
                 alignment: WrapAlignment.center,
                 children: [
-                  _buildDraggableOption('🔗 Maçã'),
-                  _buildDraggableOption('🔗 Caderno'),
-                  _buildDraggableOption('🔗 Pular'),
+                  _buildDraggableOption('Maçã'),
+                  _buildDraggableOption('Caderno'),
+                  _buildDraggableOption('Pular'),
                 ],
               ),
               const SizedBox(height: 40),
             ],
 
-            // Feedback Visual (Sucesso ou Erro)
+            // Feedback Visual
             if (state.hasTested)
               Padding(
                 padding: const EdgeInsets.only(bottom: 24.0),
@@ -141,19 +154,20 @@ class LessonThreePage extends ConsumerWidget {
     );
   }
 
-  // Novo widget para organizar as linhas de código
+  // Recebe uma themeColor para diferenciar as variáveis
   Widget _buildCodeLine({
     required String number,
     required String variableName,
     required String? droppedItem,
     required Function(String) onAccept,
+    required Color themeColor,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(number, style: AppTypography.title(color: AppColors.gray30)),
         const SizedBox(width: 16),
-        _buildCodeBlock(variableName, AppColors.purplePrimary),
+        _buildCodeBlock(variableName, themeColor), // Variável usa a cor do tema
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.0),
           child: Text(
@@ -165,12 +179,12 @@ class LessonThreePage extends ConsumerWidget {
           onAcceptWithDetails: (details) => onAccept(details.data),
           builder: (context, candidateData, rejectedData) {
             return Container(
-              width: 120,
+              width:
+                  130, // Aumentei um pouco para caber o ícone + texto folgado
               height: 48,
               decoration: BoxDecoration(
-                color: droppedItem != null
-                    ? AppColors.purplePrimary
-                    : AppColors.gray10,
+                // Se preenchido, usa a cor da variável. Se vazio, fica cinza
+                color: droppedItem != null ? themeColor : AppColors.gray10,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: candidateData.isNotEmpty
@@ -180,12 +194,27 @@ class LessonThreePage extends ConsumerWidget {
                 ),
               ),
               alignment: Alignment.center,
-              child: Text(
-                droppedItem ?? '🔗 ...',
-                style: AppTypography.button(
-                  color: droppedItem != null ? Colors.white : AppColors.gray50,
-                ),
-              ),
+              // Se tiver um item, mostra o ícone e o texto. Se não, mostra reticências.
+              child: droppedItem != null
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _getIconForItem(droppedItem),
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          droppedItem,
+                          style: AppTypography.button(color: Colors.white),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      '...',
+                      style: AppTypography.button(color: AppColors.gray50),
+                    ),
             );
           },
         ),
@@ -193,34 +222,53 @@ class LessonThreePage extends ConsumerWidget {
     );
   }
 
-  // O parâmetro textColor resolveu o bug do texto branco no fundo branco!
-  Widget _buildCodeBlock(String text, Color bgColor, {Color? textColor}) {
+  // O _buildCodeBlock agora aceita um IconData opcional!
+  Widget _buildCodeBlock(
+    String text,
+    Color bgColor, {
+    Color? textColor,
+    IconData? icon,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
-        text,
-        style: AppTypography.button(color: textColor ?? Colors.white),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: textColor ?? Colors.white, size: 20),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            text,
+            style: AppTypography.button(color: textColor ?? Colors.white),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildDraggableOption(String text) {
+    final icon = _getIconForItem(text); // Pega o ícone certo
     return Draggable<String>(
-      data: text.replaceAll('🔗 ', ''),
+      data: text, // Envia apenas a palavra pura
       feedback: Material(
         color: Colors.transparent,
-        child: _buildCodeBlock(text, AppColors.purplePrimary.withOpacity(0.8)),
+        child: _buildCodeBlock(
+          text,
+          AppColors.purplePrimary.withOpacity(0.8),
+          icon: icon, // Mostra o ícone enquanto arrasta
+        ),
       ),
-      childWhenDragging: _buildCodeBlock(text, AppColors.gray20),
-      // Passando a cor roxa para o texto quando a opção está solta!
+      childWhenDragging: _buildCodeBlock(text, AppColors.gray20, icon: icon),
       child: _buildCodeBlock(
         text,
         Colors.white,
         textColor: AppColors.purplePrimary,
+        icon: icon, // Mostra o ícone na pecinha solta
       ).applyBorder(),
     );
   }

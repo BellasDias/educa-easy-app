@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "657815140282-ujdjlk1fbjc48sb1ve5alr6uq0d24ld5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.educaeasy_app",
+            "certificate_hash": "17a3512ebee53c527c0775d1b2388fe71344a9ab"
+          }
+        },
+        {
           "client_id": "657815140282-ka3f6oip7vpi6idftqaqnl0ksmfo697s.apps.googleusercontent.com",
           "client_type": 3
         }

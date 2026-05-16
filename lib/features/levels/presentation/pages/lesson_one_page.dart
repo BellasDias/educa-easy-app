@@ -10,6 +10,24 @@ import '../../../levels_map/domain/map_progress_provider.dart';
 class LessonOnePage extends ConsumerWidget {
   const LessonOnePage({super.key});
 
+  // Função auxiliar para descobrir qual ícone usar com base na ação
+  IconData _getIconForItem(String item) {
+    switch (item) {
+      case 'Colocar as meias':
+        return Icons.checkroom_rounded; // Ícone de guarda-roupa/vestuário
+      case 'Amarrar o cadarço':
+        return Icons.all_inclusive_rounded; // Lembra um nó/laço
+      case 'Calçar o sapato':
+        return Icons.directions_walk_rounded; // Ícone de caminhada/sapato
+      case 'Colocar o chapéu':
+        return Icons.face_rounded; // Rosto/Cabeça
+      case 'Lavar as mãos':
+        return Icons.clean_hands_rounded; // Lavar as mãos
+      default:
+        return Icons.extension_rounded;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(lessonOneProvider);
@@ -18,14 +36,12 @@ class LessonOnePage extends ConsumerWidget {
     // O "Ouvinte Mágico" da Fase 1
     ref.listen<LessonOneState>(lessonOneProvider, (previous, next) {
       if (next.isSuccess && (previous?.isSuccess != true)) {
-        // 1. Libera a Fase 2 no mapa global!
-        ref.read(mapProgressProvider.notifier).state = 2;
-
-        // 2. Espera 3 segundos e volta pro mapa
+        final currentProgress = ref.read(mapProgressProvider);
+        if (currentProgress < 2) {
+          ref.read(mapProgressProvider.notifier).state = 2;
+        }
         Future.delayed(const Duration(seconds: 3), () {
-          if (context.mounted) {
-            context.pop();
-          }
+          if (context.mounted) context.pop();
         });
       }
     });
@@ -59,32 +75,33 @@ class LessonOnePage extends ConsumerWidget {
             ),
             const SizedBox(height: 48),
 
-            // O Visual de "Sequência / Lista"
-            _buildFixedStep('1', 'Colocar as meias'),
+            // O Visual de "Sequência / Lista" (Agora com cores e ícones!)
+            _buildFixedStep('1', 'Colocar as meias', Colors.blue.shade600),
             const SizedBox(height: 16),
 
-            // O Slot interativo da Fase 1
+            // O Slot interativo da Fase 1 (Laranja para chamar atenção)
             _buildInteractiveStep(
               '2',
               state.droppedItem,
               (item) => controller.setDroppedItem(item),
+              Colors.orange.shade600,
             ),
             const SizedBox(height: 16),
 
-            _buildFixedStep('3', 'Amarrar o cadarço'),
+            _buildFixedStep('3', 'Amarrar o cadarço', Colors.green.shade600),
 
             const Spacer(),
 
-            // Opções Arrastáveis
+            // Opções Arrastáveis (Sem a corrente e com os ícones automáticos)
             if (!state.isSuccess) ...[
               Wrap(
                 spacing: 16,
                 runSpacing: 16,
                 alignment: WrapAlignment.center,
                 children: [
-                  _buildDraggableOption('🔗 Calçar o sapato'),
-                  _buildDraggableOption('🔗 Colocar o chapéu'),
-                  _buildDraggableOption('🔗 Lavar as mãos'),
+                  _buildDraggableOption('Calçar o sapato'),
+                  _buildDraggableOption('Colocar o chapéu'),
+                  _buildDraggableOption('Lavar as mãos'),
                 ],
               ),
               const SizedBox(height: 40),
@@ -137,8 +154,8 @@ class LessonOnePage extends ConsumerWidget {
     );
   }
 
-  // Widget para os passos que já estão preenchidos na tela (Meia e Cadarço)
-  Widget _buildFixedStep(String number, String text) {
+  // Widget para os passos que já estão preenchidos na tela (Recebe a cor do tema e o ícone)
+  Widget _buildFixedStep(String number, String text, Color themeColor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -151,7 +168,9 @@ class LessonOnePage extends ConsumerWidget {
           ),
         ),
         const SizedBox(width: 16),
-        Expanded(child: _buildCodeBlock(text, AppColors.purplePrimary)),
+        Expanded(
+          child: _buildCodeBlock(text, themeColor, icon: _getIconForItem(text)),
+        ),
       ],
     );
   }
@@ -161,6 +180,7 @@ class LessonOnePage extends ConsumerWidget {
     String number,
     String? droppedItem,
     Function(String) onAccept,
+    Color themeColor,
   ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -181,9 +201,7 @@ class LessonOnePage extends ConsumerWidget {
               return Container(
                 height: 48,
                 decoration: BoxDecoration(
-                  color: droppedItem != null
-                      ? AppColors.purplePrimary
-                      : AppColors.gray10,
+                  color: droppedItem != null ? themeColor : AppColors.gray10,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: candidateData.isNotEmpty
@@ -191,17 +209,28 @@ class LessonOnePage extends ConsumerWidget {
                         : Colors.transparent,
                     width: 2,
                   ),
-                  // Uma borda tracejada ficaria legal aqui no futuro se for um espaço vazio!
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  droppedItem ?? 'Arraste a próxima ação aqui',
-                  style: AppTypography.button(
-                    color: droppedItem != null
-                        ? Colors.white
-                        : AppColors.gray50,
-                  ),
-                ),
+                child: droppedItem != null
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _getIconForItem(droppedItem),
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            droppedItem,
+                            style: AppTypography.button(color: Colors.white),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        'Arraste a próxima ação aqui',
+                        style: AppTypography.button(color: AppColors.gray50),
+                      ),
               );
             },
           ),
@@ -210,7 +239,13 @@ class LessonOnePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildCodeBlock(String text, Color bgColor, {Color? textColor}) {
+  // Bloco atualizado com suporte ao ícone
+  Widget _buildCodeBlock(
+    String text,
+    Color bgColor, {
+    Color? textColor,
+    IconData? icon,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -218,25 +253,41 @@ class LessonOnePage extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       alignment: Alignment.center,
-      child: Text(
-        text,
-        style: AppTypography.button(color: textColor ?? Colors.white),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: textColor ?? Colors.white, size: 20),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            text,
+            style: AppTypography.button(color: textColor ?? Colors.white),
+          ),
+        ],
       ),
     );
   }
 
+  // Opções arrastáveis gerando o ícone dinamicamente
   Widget _buildDraggableOption(String text) {
+    final icon = _getIconForItem(text);
     return Draggable<String>(
-      data: text.replaceAll('🔗 ', ''),
+      data: text, // O valor real sem emoji
       feedback: Material(
         color: Colors.transparent,
-        child: _buildCodeBlock(text, AppColors.purplePrimary.withOpacity(0.8)),
+        child: _buildCodeBlock(
+          text,
+          AppColors.purplePrimary.withOpacity(0.8),
+          icon: icon,
+        ),
       ),
-      childWhenDragging: _buildCodeBlock(text, AppColors.gray20),
+      childWhenDragging: _buildCodeBlock(text, AppColors.gray20, icon: icon),
       child: _buildCodeBlock(
         text,
         Colors.white,
         textColor: AppColors.purplePrimary,
+        icon: icon,
       ).applyBorder(),
     );
   }

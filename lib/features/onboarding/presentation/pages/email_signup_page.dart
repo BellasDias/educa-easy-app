@@ -21,8 +21,7 @@ class EmailSignupPage extends StatefulWidget {
 class _EmailSignupPageState extends State<EmailSignupPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  
+
   bool _isLoading = false;
   final _authRepository = FirebaseAuthRepositoryImpl(FirebaseAuth.instance);
 
@@ -30,49 +29,40 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleSignup() async {
+  // Mudei o nome para _handleLogin para fazer sentido
+  Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    final confirmPassword = _confirmPasswordController.text;
 
     // Validações simples
-    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      _showError('Preencha todos os campos!');
-      return;
-    }
-    
-    if (password != confirmPassword) {
-      _showError('As senhas não coincidem!');
-      return;
-    }
-
-    if (password.length < 6) {
-      _showError('A senha deve ter pelo menos 6 caracteres.');
+    if (email.isEmpty || password.isEmpty) {
+      _showError('Preencha o e-mail e a senha!');
       return;
     }
 
     setState(() => _isLoading = true);
 
     try {
-      // Chama o método que criamos na etapa anterior
-      await _authRepository.signUpWithEmail(email, password);
-      
+      // CORREÇÃO: Chama o método de ENTRAR em vez de CRIAR CONTA
+      await _authRepository.signInWithEmail(email, password);
+
       if (mounted) {
-        // Se deu tudo certo e sincronizou com a nuvem, manda pro mapa de níveis!
-        context.push('/levels'); 
+        // Se o login deu certo, manda pro mapa de níveis!
+        context.push('/levels');
       }
     } on FirebaseAuthException catch (e) {
-      // Tratamento de erros comuns do Firebase
-      if (e.code == 'email-already-in-use') {
-        _showError('Este e-mail já está cadastrado.');
+      // Tratamento de erros comuns de Login
+      if (e.code == 'user-not-found' ||
+          e.code == 'wrong-password' ||
+          e.code == 'invalid-credential') {
+        _showError('E-mail ou senha incorretos.');
       } else if (e.code == 'invalid-email') {
         _showError('E-mail inválido.');
       } else {
-        _showError('Erro ao criar conta: ${e.message}');
+        _showError('Erro ao fazer login: ${e.message}');
       }
     } catch (e) {
       _showError('Ocorreu um erro inesperado. Tente novamente.');
@@ -106,9 +96,9 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
             },
             child: Text(
               "Criar uma conta",
-              style: AppTypography.body(color: Colors.blue).copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+              style: AppTypography.body(
+                color: Colors.blue,
+              ).copyWith(fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -128,10 +118,9 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
               children: [
                 Text(
                   "Digite seu e-mail:",
-                  style: AppTypography.title(color: AppColors.gray40).copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  ),
+                  style: AppTypography.title(
+                    color: AppColors.gray40,
+                  ).copyWith(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
                 SizedBox(
                   height: 52,
@@ -148,12 +137,12 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 8,
               children: [
+                // CORREÇÃO: Alterei o texto de "e-mail" para "senha"
                 Text(
-                  "Digite seu e-mail:",
-                  style: AppTypography.title(color: AppColors.gray40).copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  ),
+                  "Digite sua senha:",
+                  style: AppTypography.title(
+                    color: AppColors.gray40,
+                  ).copyWith(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
                 SizedBox(
                   height: 52,
@@ -168,9 +157,10 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
             SizedBox(
               width: double.infinity,
               child: EducaeasyButton(
-              text: _isLoading ? 'Criando...' : 'Entrar',
-              variant: ButtonVariant.primary,
-              onPressed: _isLoading ? () {} : _handleSignup,
+                text: _isLoading ? 'Entrando...' : 'Entrar',
+                variant: ButtonVariant.primary,
+                // CORREÇÃO: Chama a função de login que configuramos
+                onPressed: _isLoading ? () {} : _handleLogin,
               ),
             ),
           ],

@@ -16,7 +16,10 @@ class LessonFourPage extends ConsumerWidget {
 
     ref.listen<LessonFourState>(lessonFourProvider, (previous, next) {
       if (next.isSuccess && (previous?.isSuccess != true)) {
-        ref.read(mapProgressProvider.notifier).state = 5;
+        final currentProgress = ref.read(mapProgressProvider);
+        if (currentProgress < 5) {
+          ref.read(mapProgressProvider.notifier).state = 5;
+        }
         Future.delayed(const Duration(seconds: 3), () {
           if (context.mounted) context.pop();
         });
