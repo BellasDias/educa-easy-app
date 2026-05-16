@@ -8,6 +8,7 @@ abstract class AuthRepository {
   Future<void> saveUserAge(int age);
   Future<bool> signInWithGoogle();
   Future<void> signUpWithEmail(String email, String password);
+  Future<void> signInWithEmail(String email, String password);
   Future<void> syncProfileToCloud();
   Future<UserModel?> getCurrentUserData();
   Future<void> signOut();
