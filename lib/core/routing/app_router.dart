@@ -1,6 +1,7 @@
 import 'package:educaeasy_app/features/levels_map/presentation/pages/levels_page.dart';
 import 'package:educaeasy_app/features/onboarding/presentation/pages/age_input_page.dart';
 import 'package:educaeasy_app/features/onboarding/presentation/pages/create_account_page.dart';
+import 'package:educaeasy_app/features/store/presentation/pages/store_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
@@ -111,6 +112,10 @@ class AppRouter {
       GoRoute(
         path: '/lesson-seven',
         builder: (context, state) => const LessonSevenPage(),
+      ),
+      GoRoute(
+        path: '/store', 
+        builder: (context, state) => StorePage(),
       ),
     ],
   );

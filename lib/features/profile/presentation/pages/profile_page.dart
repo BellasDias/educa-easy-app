@@ -1,4 +1,6 @@
+import 'package:educaeasy_app/features/store/data/avatar_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 // 1. Roteamento (Usando caminhos relativos para garantir que o Flutter encontre)
@@ -168,24 +170,44 @@ class _ProfilePageState extends State<ProfilePage> {
   // --- SUB-WIDGETS ---
 
   Widget _buildUserHeader(String name, String email, String age) {
+    final AvatarService avatarService = AvatarService();
+
     return Column(
       children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            color: AppColors.bluePrimaryLighter.withValues(alpha: 0.2),
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.bluePrimary, width: 2),
-          ),
-          child: Center(
-            child: Text(
-              name.isNotEmpty ? name[0].toUpperCase() : 'U',
-              style: AppTypography.title(
-                color: AppColors.bluePrimary,
-              ).copyWith(fontSize: 40, fontWeight: FontWeight.bold),
-            ),
-          ),
+        // O ValueListenableBuilder reconstrói APENAS este bloco quando o avatar muda
+        ValueListenableBuilder<String?>(
+          valueListenable: avatarService.selectedAvatarNotifier,
+          builder: (context, selectedSvg, child) {
+            return Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: AppColors.bluePrimaryLighter.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.bluePrimary, width: 2),
+              ),
+              // ClipRRect garante que o SVG não "vaze" para fora das bordas arredondadas do círculo
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(50),
+                child: selectedSvg != null
+                    ? Padding(
+                        padding: const EdgeInsets.all(12.0), // Espaçamento para o avatar respirar no círculo
+                        child: SvgPicture.string(
+                          selectedSvg,
+                          fit: BoxFit.contain,
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          name.isNotEmpty ? name[0].toUpperCase() : 'U',
+                          style: AppTypography.title(
+                            color: AppColors.bluePrimary,
+                          ).copyWith(fontSize: 40, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 16),
         Text(
