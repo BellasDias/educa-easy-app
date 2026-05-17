@@ -165,6 +165,16 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  // NOVA FUNÇÃO: Envia o e-mail de recuperação de senha
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw Exception('Erro ao enviar e-mail de recuperação: $e');
+    }
+  }
+
   @override
   Future<void> signOut() async {
     try {

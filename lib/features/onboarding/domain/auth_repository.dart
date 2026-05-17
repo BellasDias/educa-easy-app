@@ -10,6 +10,7 @@ abstract class AuthRepository {
   Future<void> signUpWithEmail(String email, String password);
   Future<void> signInWithEmail(String email, String password);
   Future<void> syncProfileToCloud();
+  Future<void> sendPasswordResetEmail(String email);
   Future<UserModel?> getCurrentUserData();
   Future<void> signOut();
 }

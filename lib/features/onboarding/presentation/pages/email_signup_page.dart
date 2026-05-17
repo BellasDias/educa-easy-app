@@ -32,7 +32,6 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
     super.dispose();
   }
 
-  // Mudei o nome para _handleLogin para fazer sentido
   Future<void> _handleLogin() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -46,15 +45,12 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
     setState(() => _isLoading = true);
 
     try {
-      // CORREÇÃO: Chama o método de ENTRAR em vez de CRIAR CONTA
       await _authRepository.signInWithEmail(email, password);
 
       if (mounted) {
-        // Se o login deu certo, manda pro mapa de níveis!
         context.push('/levels');
       }
     } on FirebaseAuthException catch (e) {
-      // Tratamento de erros comuns de Login
       if (e.code == 'user-not-found' ||
           e.code == 'wrong-password' ||
           e.code == 'invalid-credential') {
@@ -63,6 +59,48 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
         _showError('E-mail inválido.');
       } else {
         _showError('Erro ao fazer login: ${e.message}');
+      }
+    } catch (e) {
+      _showError('Ocorreu um erro inesperado. Tente novamente.');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  // NOVA FUNÇÃO: Recuperação de Senha
+  Future<void> _handleForgotPassword() async {
+    final email = _emailController.text.trim();
+
+    if (email.isEmpty) {
+      _showError('Digite seu e-mail no campo acima para recuperar a senha.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _authRepository.sendPasswordResetEmail(email);
+
+      if (mounted) {
+        // Mensagem verde de sucesso
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'E-mail de recuperação enviado! Verifique sua caixa de entrada.',
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        _showError('Nenhuma conta encontrada com este e-mail.');
+      } else if (e.code == 'invalid-email') {
+        _showError('E-mail inválido.');
+      } else {
+        _showError('Erro ao recuperar senha: ${e.message}');
       }
     } catch (e) {
       _showError('Ocorreu um erro inesperado. Tente novamente.');
@@ -82,7 +120,7 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
   @override
   Widget build(BuildContext context) {
     return OnboardingShell(
-      showBackButton: true, // Adiciona o botão de voltar no topo
+      showBackButton: true,
       footer: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -133,23 +171,40 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
               ],
             ),
 
+            // Agrupei a senha e o botão de esqueci a senha
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.end, // Alinha os filhos à direita
               spacing: 8,
               children: [
-                // CORREÇÃO: Alterei o texto de "e-mail" para "senha"
-                Text(
-                  "Digite sua senha:",
-                  style: AppTypography.title(
-                    color: AppColors.gray40,
-                  ).copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 8,
+                  children: [
+                    Text(
+                      "Digite sua senha:",
+                      style: AppTypography.title(
+                        color: AppColors.gray40,
+                      ).copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                    SizedBox(
+                      height: 52,
+                      child: EducaeasyInput(
+                        placeholder: 'Senha',
+                        controller: _passwordController,
+                        obscureText: true,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(
-                  height: 52,
-                  child: EducaeasyInput(
-                    placeholder: 'Senha',
-                    controller: _passwordController,
-                    obscureText: true, // Esconde os caracteres (***)
+                // NOVO VISUAL: Botão Esqueci minha senha
+                GestureDetector(
+                  onTap: _isLoading ? null : _handleForgotPassword,
+                  child: Text(
+                    "Esqueci minha senha",
+                    style: AppTypography.body(
+                      color: Colors.blue,
+                    ).copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -157,9 +212,8 @@ class _EmailSignupPageState extends State<EmailSignupPage> {
             SizedBox(
               width: double.infinity,
               child: EducaeasyButton(
-                text: _isLoading ? 'Entrando...' : 'Entrar',
+                text: _isLoading ? 'Aguarde...' : 'Entrar',
                 variant: ButtonVariant.primary,
-                // CORREÇÃO: Chama a função de login que configuramos
                 onPressed: _isLoading ? () {} : _handleLogin,
               ),
             ),
