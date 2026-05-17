@@ -34,7 +34,6 @@ class _LevelMapModuleState extends ConsumerState<LevelMapModule> {
         y: 150,
         title: "Introdução",
         status: _getStatus(1, currentProgress),
-        starCount: 1,
         drawerTitle: "A Ordem das Coisas",
         description:
             "Você já reparou que tudo tem um jeito certo de ser feito? Primeiro colocamos as meias, só depois os sapatos! Vamos aprender a organizar nossas ações passo a passo.",
@@ -48,7 +47,6 @@ class _LevelMapModuleState extends ConsumerState<LevelMapModule> {
         y: 300,
         title: "Fundamentos",
         status: _getStatus(2, currentProgress),
-        starCount: 2,
         drawerTitle: "A Continuidade",
         description:
             "Agora que já sabemos que tudo tem uma ordem, vamos treinar a sequência correta dos números. Você sabe quem vem depois de quem?",
@@ -64,7 +62,6 @@ class _LevelMapModuleState extends ConsumerState<LevelMapModule> {
         y: 450,
         title: "Variáveis",
         status: _getStatus(3, currentProgress),
-        starCount: 3,
         drawerTitle: "As Caixas Mágicas",
         description:
             "Você sabia que os computadores usam 'caixinhas' para guardar informações de certo tipo nelas? Elas se chamam Variáveis! Vamos aprender a guardar objetos dentro de seus respectivos recipientes.",
@@ -79,7 +76,6 @@ class _LevelMapModuleState extends ConsumerState<LevelMapModule> {
         y: 600,
         title: "Condicionais",
         status: _getStatus(4, currentProgress),
-        starCount: 4,
         drawerTitle: "Caminhos e Escolhas",
         description:
             "Às vezes precisamos decidir o que fazer dependendo do que acontece à nossa volta. Vamos ajudar a escolher o melhor caminho?",
@@ -93,7 +89,6 @@ class _LevelMapModuleState extends ConsumerState<LevelMapModule> {
         y: 780,
         title: "Desafio 1",
         status: _getStatus(5, currentProgress),
-        starCount: 5,
         isSpecial: true,
         drawerTitle: "Missão Espacial",
         description:
@@ -108,7 +103,6 @@ class _LevelMapModuleState extends ConsumerState<LevelMapModule> {
         y: 950,
         title: "Laços",
         status: _getStatus(6, currentProgress),
-        starCount: 4,
         drawerTitle: "A Rotina Diária",
         description:
             "Você sabia que a gente repete algumas coisas várias vezes até que elas terminem? Isso se chama Laço de Repetição! Vamos organizar nossa rotina?",
@@ -122,7 +116,6 @@ class _LevelMapModuleState extends ConsumerState<LevelMapModule> {
         y: 1100,
         title: "Funções",
         status: _getStatus(7, currentProgress),
-        starCount: 3,
         drawerTitle: "Receitas Prontas",
         description:
             "Em vez de fazer a mesma coisa passo a passo toda vez, podemos criar uma Receita Pronta! Vamos descobrir quais comandos agrupam nossas ações?",

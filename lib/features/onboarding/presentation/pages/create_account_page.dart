@@ -22,7 +22,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+
   bool _isLoading = false;
   final _authRepository = FirebaseAuthRepositoryImpl(FirebaseAuth.instance);
 
@@ -44,7 +44,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       _showError('Preencha todos os campos!');
       return;
     }
-    
+
     if (password != confirmPassword) {
       _showError('As senhas não coincidem!');
       return;
@@ -60,10 +60,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     try {
       // Chama o método que criamos na etapa anterior
       await _authRepository.signUpWithEmail(email, password);
-      
+
       if (mounted) {
         // Se deu tudo certo e sincronizou com a nuvem, manda pro mapa de níveis!
-        context.push('/levels'); 
+        context.push('/levels');
       }
     } on FirebaseAuthException catch (e) {
       // Tratamento de erros comuns do Firebase
@@ -106,9 +106,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             },
             child: Text(
               "Entrar",
-              style: AppTypography.body(color: Colors.blue).copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+              style: AppTypography.body(
+                color: Colors.blue,
+              ).copyWith(fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -128,10 +128,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               children: [
                 Text(
                   "Digite seu e-mail",
-                  style: AppTypography.title(color: AppColors.gray40).copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  ),
+                  style: AppTypography.title(
+                    color: AppColors.gray40,
+                  ).copyWith(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
                 SizedBox(
                   height: 52,
@@ -150,10 +149,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               children: [
                 Text(
                   "Crie sua senha",
-                  style: AppTypography.title(color: AppColors.gray40).copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  ),
+                  style: AppTypography.title(
+                    color: AppColors.gray40,
+                  ).copyWith(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
                 SizedBox(
                   height: 52,
@@ -171,16 +169,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               children: [
                 Text(
                   "Confirme sua senha",
-                  style: AppTypography.title(color: AppColors.gray40).copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  ),
+                  style: AppTypography.title(
+                    color: AppColors.gray40,
+                  ).copyWith(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
                 SizedBox(
                   height: 52,
                   child: EducaeasyInput(
                     placeholder: 'Senha',
-                    controller: _passwordController,
+                    controller:
+                        _confirmPasswordController, // <--- CORRIGIDO AQUI!
                     obscureText: true, // Esconde os caracteres (***)
                   ),
                 ),
@@ -189,9 +187,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             SizedBox(
               width: double.infinity,
               child: EducaeasyButton(
-              text: _isLoading ? 'Criando...' : 'Criar conta',
-              variant: ButtonVariant.primary,
-              onPressed: _isLoading ? () {} : _handleSignup,
+                text: _isLoading ? 'Criando...' : 'Criar conta',
+                variant: ButtonVariant.primary,
+                onPressed: _isLoading ? () {} : _handleSignup,
               ),
             ),
           ],

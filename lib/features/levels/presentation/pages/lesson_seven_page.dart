@@ -17,7 +17,10 @@ class LessonSevenPage extends ConsumerWidget {
     // Escuta a vitória. (Como a 7 é a última do mapa atual, podemos ir para a 8 virtualmente)
     ref.listen<LessonSevenState>(lessonSevenProvider, (previous, next) {
       if (next.isSuccess && (previous?.isSuccess != true)) {
-        ref.read(mapProgressProvider.notifier).state = 8;
+        final currentProgress = ref.read(mapProgressProvider);
+        if (currentProgress < 8) {
+          ref.read(mapProgressProvider.notifier).state = 8;
+        }
         Future.delayed(const Duration(seconds: 3), () {
           if (context.mounted) context.pop();
         });
