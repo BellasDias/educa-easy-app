@@ -12,6 +12,8 @@ import 'package:educaeasy_app/features/onboarding/presentation/pages/welcome_pag
 import 'package:educaeasy_app/features/onboarding/presentation/pages/email_signup_page.dart';
 import '../../features/home/home_page.dart';
 import 'package:educaeasy_app/features/profile/presentation/pages/profile_page.dart';
+import 'package:educaeasy_app/features/trophies/presentation/pages/trophies_page.dart';
+import 'package:educaeasy_app/features/profile/presentation/pages/edit_profile_page.dart';
 
 import 'package:educaeasy_app/features/levels/presentation/pages/lesson_one_page.dart';
 import 'package:educaeasy_app/features/levels/presentation/pages/lesson_two_page.dart';
@@ -114,9 +116,14 @@ class AppRouter {
         builder: (context, state) => const LessonSevenPage(),
       ),
       GoRoute(
-        path: '/store', 
-        builder: (context, state) => StorePage(),
+        path: '/edit-profile',
+        builder: (context, state) => const EditProfilePage(),
       ),
+      GoRoute(
+        path: '/trophies',
+        builder: (context, state) => const TrophiesPage(),
+      ),
+      GoRoute(path: '/store', builder: (context, state) => StorePage()),
     ],
   );
 }

@@ -12,5 +12,6 @@ abstract class AuthRepository {
   Future<void> syncProfileToCloud();
   Future<void> sendPasswordResetEmail(String email);
   Future<UserModel?> getCurrentUserData();
+  Future<void> addCoins(int amount);
   Future<void> signOut();
 }

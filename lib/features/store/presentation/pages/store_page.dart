@@ -55,9 +55,15 @@ class CharacterModel {
   });
 }
 
-class StorePage extends StatelessWidget {
-  StorePage({super.key});
+// Transformado em StatefulWidget para usar o initState
+class StorePage extends StatefulWidget {
+  const StorePage({super.key});
 
+  @override
+  State<StorePage> createState() => _StorePageState();
+}
+
+class _StorePageState extends State<StorePage> {
   final AvatarService _avatarService = AvatarService();
 
   final List<CharacterModel> characters = [
@@ -67,6 +73,13 @@ class StorePage extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // ⬇️ ISSO AQUI FAZ A LOJA PUXAR O DINHEIRO REAL DO FIREBASE NA HORA DE ABRIR
+    _avatarService.init();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.gray05,
@@ -74,7 +87,10 @@ class StorePage extends StatelessWidget {
         backgroundColor: AppColors.gray00,
         elevation: 0,
         centerTitle: true,
-        title: Text('Loja de Avatares', style: AppTypography.title(color: AppColors.gray90)),
+        title: Text(
+          'Loja de Avatares',
+          style: AppTypography.title(color: AppColors.gray90),
+        ),
         actions: [
           // Escuta reativa do saldo de moedas no topo
           ValueListenableBuilder<int>(
@@ -82,7 +98,10 @@ class StorePage extends StatelessWidget {
             builder: (context, coins, child) {
               return Container(
                 margin: const EdgeInsets.only(right: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.yellowPastelPrimary,
                   borderRadius: BorderRadius.circular(16),
@@ -90,14 +109,21 @@ class StorePage extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.monetization_on_rounded, color: AppColors.yellowDark, size: 20),
+                    const Icon(
+                      Icons.monetization_on_rounded,
+                      color: AppColors.yellowDark,
+                      size: 20,
+                    ),
                     const SizedBox(width: 4),
-                    Text('$coins', style: AppTypography.button(color: AppColors.gray90)),
+                    Text(
+                      '$coins',
+                      style: AppTypography.button(color: AppColors.gray90),
+                    ),
                   ],
                 ),
               );
             },
-          )
+          ),
         ],
       ),
       body: Padding(
@@ -105,7 +131,10 @@ class StorePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Escolha seu parceiro de estudos!', style: AppTypography.body(color: AppColors.gray60)),
+            Text(
+              'Escolha seu parceiro de estudos!',
+              style: AppTypography.body(color: AppColors.gray60),
+            ),
             const SizedBox(height: 24),
             Expanded(
               child: AnimatedBuilder(
@@ -114,16 +143,19 @@ class StorePage extends StatelessWidget {
                   _avatarService.ownedAvatarsNotifier,
                 ]),
                 builder: (context, child) {
-                  final equippedSvg = _avatarService.selectedAvatarNotifier.value;
+                  final equippedSvg =
+                      _avatarService.selectedAvatarNotifier.value;
                   final ownedList = _avatarService.ownedAvatarsNotifier.value;
 
                   return GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 0.65, // Ajustado ligeiramente para evitar overflow
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio:
+                              0.65, // Ajustado ligeiramente para evitar overflow
+                        ),
                     itemCount: characters.length,
                     itemBuilder: (context, index) {
                       final character = characters[index];
@@ -134,12 +166,20 @@ class StorePage extends StatelessWidget {
                         character: character,
                         isOwned: isOwned,
                         isSelected: isSelected,
-                        onEquip: () => _avatarService.selectAvatar(character.svgData),
+                        onEquip: () =>
+                            _avatarService.selectAvatar(character.svgData),
                         onBuy: () async {
-                          final success = await _avatarService.purchaseAvatar(character.name, character.price);
+                          final success = await _avatarService.purchaseAvatar(
+                            character.name,
+                            character.price,
+                          );
                           if (!success && context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Moedas insuficientes para a compra!')),
+                              const SnackBar(
+                                content: Text(
+                                  'Moedas insuficientes para a compra!',
+                                ),
+                              ),
                             );
                           }
                         },
@@ -156,7 +196,7 @@ class StorePage extends StatelessWidget {
   }
 }
 
-class _CharacterCard extends StatelessWidget {
+class _CharacterCard extends StatefulWidget {
   final CharacterModel character;
   final bool isOwned;
   final bool isSelected;
@@ -172,17 +212,26 @@ class _CharacterCard extends StatelessWidget {
   });
 
   @override
+  State<_CharacterCard> createState() => _CharacterCardState();
+}
+
+class _CharacterCardState extends State<_CharacterCard> {
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.gray00,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isSelected ? AppColors.bluePrimary : AppColors.gray20, 
-          width: isSelected ? 2.0 : 1.5,
+          color: widget.isSelected ? AppColors.bluePrimary : AppColors.gray20,
+          width: widget.isSelected ? 2.0 : 1.5,
         ),
         boxShadow: const [
-          BoxShadow(color: AppColors.gray10, offset: Offset(0, 4), blurRadius: 8),
+          BoxShadow(
+            color: AppColors.gray10,
+            offset: Offset(0, 4),
+            blurRadius: 8,
+          ),
         ],
       ),
       child: Column(
@@ -190,39 +239,53 @@ class _CharacterCard extends StatelessWidget {
         children: [
           const SizedBox(height: 16),
           Expanded(
-            child: SvgPicture.string(character.svgData, fit: BoxFit.contain, width: 80),
+            child: SvgPicture.string(
+              widget.character.svgData,
+              fit: BoxFit.contain,
+              width: 80,
+            ),
           ),
           const SizedBox(height: 12),
           Text(
-            character.name,
-            style: AppTypography.title(color: AppColors.gray90).copyWith(fontSize: 16),
+            widget.character.name,
+            style: AppTypography.title(
+              color: AppColors.gray90,
+            ).copyWith(fontSize: 16),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.monetization_on_rounded, color: AppColors.yellowDark, size: 16),
+              const Icon(
+                Icons.monetization_on_rounded,
+                color: AppColors.yellowDark,
+                size: 16,
+              ),
               const SizedBox(width: 4),
               Text(
-                '${character.price}',
-                style: AppTypography.body(color: AppColors.gray70).copyWith(fontWeight: FontWeight.bold),
+                '${widget.character.price}',
+                style: AppTypography.body(
+                  color: AppColors.gray70,
+                ).copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: isOwned
+            child: widget.isOwned
                 ? EducaeasyButton(
-                    text: isSelected ? 'Equipado' : 'Equipar',
-                    variant: isSelected ? ButtonVariant.primary : ButtonVariant.outline,
-                    onPressed: isSelected ? () {} : onEquip,
+                    text: widget.isSelected ? 'Equipado' : 'Equipar',
+                    variant: widget.isSelected
+                        ? ButtonVariant.primary
+                        : ButtonVariant.outline,
+                    onPressed: widget.isSelected ? () {} : widget.onEquip,
                   )
                 : EducaeasyButton(
                     text: 'Comprar',
                     variant: ButtonVariant.success,
-                    onPressed: onBuy,
+                    onPressed: widget.onBuy,
                   ),
           ),
           const SizedBox(height: 16),

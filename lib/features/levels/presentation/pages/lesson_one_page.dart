@@ -1,10 +1,11 @@
+import 'package:educaeasy_app/features/onboarding/data/firebase_auth_repository_impl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:educaeasy_app/design_system/tokens/colors.dart';
 import 'package:educaeasy_app/design_system/tokens/typography.dart';
 import '../controllers/lesson_one_controller.dart';
-// ⚠️ Ajuste o caminho abaixo para onde está o seu map_progress_provider
 import '../../../levels_map/domain/map_progress_provider.dart';
 
 class LessonOnePage extends ConsumerWidget {
@@ -33,13 +34,22 @@ class LessonOnePage extends ConsumerWidget {
     final state = ref.watch(lessonOneProvider);
     final controller = ref.read(lessonOneProvider.notifier);
 
-    // O "Ouvinte Mágico" da Fase 1
     ref.listen<LessonOneState>(lessonOneProvider, (previous, next) {
       if (next.isSuccess && (previous?.isSuccess != true)) {
         final currentProgress = ref.read(mapProgressProvider);
+
         if (currentProgress < 2) {
-          ref.read(mapProgressProvider.notifier).state = 2;
+          // 🔄 MUDOU AQUI: Usando o nosso novo método que salva na nuvem!
+          ref.read(mapProgressProvider.notifier).updateProgress(2);
+
+          // 💰 GERA A RECOMPENSA NO BANCO DE DADOS (50 MOEDAS)
+          final authRepository = FirebaseAuthRepositoryImpl(
+            FirebaseAuth.instance,
+          );
+          authRepository.addCoins(50);
         }
+
+        // Espera 3 segundos e volta pro mapa
         Future.delayed(const Duration(seconds: 3), () {
           if (context.mounted) context.pop();
         });
