@@ -8,10 +8,7 @@ import '../domain/auth_repository.dart';
 class FirebaseAuthRepositoryImpl implements AuthRepository {
   final FirebaseAuth _firebaseAuth;
 
-  // Instância do Cloud Firestore
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  // Voltamos ao código original da Isa/Bella: O GoogleSignIn agora é um singleton!
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
   FirebaseAuthRepositoryImpl(this._firebaseAuth);
@@ -24,8 +21,6 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('user_name', name);
-
-      print("Nome salvo no SharedPreferences com sucesso: $name");
     } catch (e) {
       throw Exception('Erro ao salvar o nome: $e');
     }
@@ -36,7 +31,6 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('user_age', age);
-      print("Idade salva localmente: $age");
     } catch (e) {
       throw Exception('Erro ao salvar a idade: $e');
     }
@@ -52,15 +46,10 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
 
       final GoogleSignInAccount? googleUser = await _googleSignIn
           .authenticate();
-
-      if (googleUser == null) {
-        print("Login cancelado pelo usuário.");
-        return false;
-      }
+      if (googleUser == null) return false;
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
-
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
@@ -68,13 +57,21 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
       final currentUser = _firebaseAuth.currentUser;
 
       if (currentUser != null && currentUser.isAnonymous) {
-        await currentUser.linkWithCredential(credential);
+        try {
+          await currentUser.linkWithCredential(credential);
+        } on FirebaseAuthException catch (linkError) {
+          if (linkError.code == 'credential-already-in-use' ||
+              linkError.code == 'account-exists-with-different-credential') {
+            await _firebaseAuth.signInWithCredential(credential);
+          } else {
+            rethrow;
+          }
+        }
       } else {
         await _firebaseAuth.signInWithCredential(credential);
       }
 
-      await syncProfileToCloud();
-
+      // 🚨 REMOVIDO: await syncProfileToCloud(); <-- Era isso que apagava o nome antigo!
       return true;
     } catch (e) {
       print('Erro no Google Sign-In: $e');
@@ -82,7 +79,6 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  // NOVA FUNÇÃO: Serve para ENTRAR em uma conta que já existe
   @override
   Future<void> signInWithEmail(String email, String password) async {
     try {
@@ -90,7 +86,7 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
         email: email,
         password: password,
       );
-      await syncProfileToCloud();
+      // 🚨 REMOVIDO: await syncProfileToCloud(); <-- Aqui também!
     } catch (e) {
       throw Exception('Erro ao fazer login com e-mail: $e');
     }
@@ -116,7 +112,6 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
       if (user == null) return;
 
       final prefs = await SharedPreferences.getInstance();
-
       final name =
           prefs.getString('user_name') ?? user.displayName ?? 'Jogador';
       final age = prefs.getInt('user_age') ?? 0;
@@ -128,8 +123,6 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
         'isAnonymous': user.isAnonymous,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-
-      print("Perfil de $name sincronizado com o Firestore (UID: ${user.uid})");
     } catch (e) {
       throw Exception('Erro ao sincronizar com a nuvem: $e');
     }
@@ -152,7 +145,6 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
           .get();
 
       if (docSnapshot.exists && docSnapshot.data() != null) {
-        // CORREÇÃO: Adicionado o 'documentId' que a sua colega definiu no modelo!
         return UserModel.fromMap(
           docSnapshot.data()!,
           documentId: docSnapshot.id,
@@ -162,6 +154,33 @@ class FirebaseAuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       print('Erro ao carregar os dados do perfil: $e');
       return null;
+    }
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw Exception('Erro ao enviar e-mail de recuperação: $e');
+    }
+  }
+
+  // NOVA FUNÇÃO: Adiciona moedas na conta da criança
+  @override
+  Future<void> addCoins(int amount) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) return;
+
+      // O FieldValue.increment faz a matemática com segurança no servidor!
+      await _firestore.collection('users').doc(user.uid).set({
+        'coins': FieldValue.increment(amount),
+      }, SetOptions(merge: true));
+
+      print("Sucesso! Adicionou $amount moedas ao jogador.");
+    } catch (e) {
+      throw Exception('Erro ao adicionar moedas: $e');
     }
   }
 

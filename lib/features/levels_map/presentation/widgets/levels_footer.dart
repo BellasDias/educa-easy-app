@@ -18,7 +18,14 @@ class LevelsFooter extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _FooterItem(icon: Icons.home_rounded, isSelected: true),
-            _FooterItem(icon: Icons.emoji_events_rounded, isSelected: false),
+
+            // ✅ CORREÇÃO: Adicionado a lógica para escutar o clique do troféu
+            _FooterItem(
+              icon: Icons.emoji_events_rounded,
+              isSelected: false,
+              isTrophies: true,
+            ),
+
             // O ícone de perfil agora tem a lógica de navegação direta
             _FooterItem(
               icon: Icons.person_rounded,
@@ -37,11 +44,13 @@ class _FooterItem extends StatelessWidget {
   final IconData icon;
   final bool isSelected;
   final bool isProfile;
+  final bool isTrophies; // ✅ ADICIONADO
 
   const _FooterItem({
     required this.icon,
     required this.isSelected,
     this.isProfile = false,
+    this.isTrophies = false, // ✅ ADICIONADO
   });
 
   @override
@@ -58,9 +67,12 @@ class _FooterItem extends StatelessWidget {
         if (isProfile) {
           // Usa a rota definida no seu AppRouter
           context.push('/profile');
+        } else if (isTrophies) {
+          // ✅ ENTRANDO EM AÇÃO: Redireciona direto para a galeria gamer de conquistas!
+          context.push('/trophies');
         } else {
           // Trocamos print por debugPrint para seguir as boas práticas!
-          debugPrint('Navegando...');
+          debugPrint('Navegando para o Mapa Principal...');
         }
       },
     );

@@ -1,3 +1,5 @@
+import 'package:educaeasy_app/features/onboarding/data/firebase_auth_repository_impl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,9 +19,16 @@ class LessonFivePage extends ConsumerWidget {
     ref.listen<LessonFiveState>(lessonFiveProvider, (previous, next) {
       if (next.isSuccess && (previous?.isSuccess != true)) {
         final currentProgress = ref.read(mapProgressProvider);
+
         if (currentProgress < 6) {
-          ref.read(mapProgressProvider.notifier).state = 6;
+          ref.read(mapProgressProvider.notifier).updateProgress(6);
+
+          final authRepository = FirebaseAuthRepositoryImpl(
+            FirebaseAuth.instance,
+          );
+          authRepository.addCoins(100);
         }
+
         Future.delayed(const Duration(seconds: 3), () {
           if (context.mounted) context.pop();
         });

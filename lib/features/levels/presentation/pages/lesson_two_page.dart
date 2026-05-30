@@ -1,3 +1,5 @@
+import 'package:educaeasy_app/features/onboarding/data/firebase_auth_repository_impl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,9 +19,19 @@ class LessonTwoPage extends ConsumerWidget {
     ref.listen<LessonTwoState>(lessonTwoProvider, (previous, next) {
       if (next.isSuccess && (previous?.isSuccess != true)) {
         final currentProgress = ref.read(mapProgressProvider);
+
         if (currentProgress < 3) {
-          ref.read(mapProgressProvider.notifier).state = 3;
+          // 🔄 MUDOU AQUI: Usando o nosso novo método que salva na nuvem!
+          ref.read(mapProgressProvider.notifier).updateProgress(3);
+
+          // 💰 GERA A RECOMPENSA NO BANCO DE DADOS (50 MOEDAS)
+          final authRepository = FirebaseAuthRepositoryImpl(
+            FirebaseAuth.instance,
+          );
+          authRepository.addCoins(50);
         }
+
+        // Espera 3 segundos e volta pro mapa
         Future.delayed(const Duration(seconds: 3), () {
           if (context.mounted) context.pop();
         });

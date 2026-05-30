@@ -1,3 +1,5 @@
+import 'package:educaeasy_app/features/onboarding/data/firebase_auth_repository_impl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,13 +16,19 @@ class LessonSevenPage extends ConsumerWidget {
     final state = ref.watch(lessonSevenProvider);
     final controller = ref.read(lessonSevenProvider.notifier);
 
-    // Escuta a vitória. (Como a 7 é a última do mapa atual, podemos ir para a 8 virtualmente)
     ref.listen<LessonSevenState>(lessonSevenProvider, (previous, next) {
       if (next.isSuccess && (previous?.isSuccess != true)) {
         final currentProgress = ref.read(mapProgressProvider);
+
         if (currentProgress < 8) {
-          ref.read(mapProgressProvider.notifier).state = 8;
+          ref.read(mapProgressProvider.notifier).updateProgress(8);
+
+          final authRepository = FirebaseAuthRepositoryImpl(
+            FirebaseAuth.instance,
+          );
+          authRepository.addCoins(50);
         }
+
         Future.delayed(const Duration(seconds: 3), () {
           if (context.mounted) context.pop();
         });

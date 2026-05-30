@@ -1,3 +1,5 @@
+import 'package:educaeasy_app/features/onboarding/data/firebase_auth_repository_impl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,13 +30,19 @@ class LessonThreePage extends ConsumerWidget {
     final state = ref.watch(lessonThreeProvider);
     final controller = ref.read(lessonThreeProvider.notifier);
 
-    // O "Ouvinte Mágico"
     ref.listen<LessonThreeState>(lessonThreeProvider, (previous, next) {
       if (next.isSuccess && (previous?.isSuccess != true)) {
         final currentProgress = ref.read(mapProgressProvider);
+
         if (currentProgress < 4) {
-          ref.read(mapProgressProvider.notifier).state = 4;
+          ref.read(mapProgressProvider.notifier).updateProgress(4);
+
+          final authRepository = FirebaseAuthRepositoryImpl(
+            FirebaseAuth.instance,
+          );
+          authRepository.addCoins(50);
         }
+
         Future.delayed(const Duration(seconds: 3), () {
           if (context.mounted) context.pop();
         });
